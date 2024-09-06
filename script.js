@@ -116,7 +116,7 @@ function setupAudioContext() {
 }
 
 function generateRandomGlyph() {
-    const glyphs = '[÷≠≈∞±∑∫∂√∆Ω∏πφ⊗⊕⊙⌐¬×°′″℮]';
+    const glyphs = '[÷≠≈∞±∑∫∂√∆Ω∏@€£¶÷±πφ⊗⊕⊙⌐¬×°′″℮]';
     let result = '';
     for (let i = 0; i < 4; i++) {
         result += glyphs[Math.floor(Math.random() * glyphs.length)];
