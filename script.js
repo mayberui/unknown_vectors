@@ -66,9 +66,8 @@ function init() {
     fullScreenButton.addEventListener('click', toggleFullScreen);
 
     setupAudioContext();
-    addAudioStartListener();
+    startPercentageCounter();
     animate();
-    showAudioLoadingIndicator();
 }
 
 function createParticles() {
@@ -113,27 +112,30 @@ function setupAudioContext() {
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-function addAudioStartListener() {
-    const startAudio = () => {
-        if (!isAudioStarted) {
-            isAudioStarted = true;
-            loadAudio().then(() => {
-                hideAudioLoadingIndicator();
-            }).catch(error => {
-                console.error('Failed to load audio:', error);
-                alert('Failed to load audio. The animation will continue without audio reactivity.');
-                hideAudioLoadingIndicator();
-            });
+function startPercentageCounter() {
+    let counter = 0;
+    const maxPercentage = 187;
+    const duration = 3000; // 3 seconds
+    const interval = duration / maxPercentage;
+
+    const counterElement = document.getElementById('percentageCounter');
+    
+    const updateCounter = () => {
+        counter++;
+        counterElement.textContent = `${counter}%`;
+        
+        if (counter >= maxPercentage) {
+            clearInterval(counterInterval);
+            counterElement.style.display = 'none';
+            loadAudio();
         }
     };
 
-    ['click', 'touchstart', 'keydown'].forEach(eventType => {
-        document.addEventListener(eventType, startAudio, { once: true });
-    });
+    const counterInterval = setInterval(updateCounter, interval);
 }
 
 function loadAudio() {
-    return fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
+    fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
         .then(audioBuffer => {
@@ -152,29 +154,11 @@ function loadAudio() {
                 const nextButton = document.getElementById('nextButton');
                 window.location.href = nextButton.href;
             };
+        })
+        .catch(error => {
+            console.error('Failed to load audio:', error);
+            alert('Failed to load audio. The animation will continue without audio reactivity.');
         });
-}
-
-function showAudioLoadingIndicator() {
-    const indicator = document.createElement('div');
-    indicator.id = 'audioLoadingIndicator';
-    indicator.style.position = 'fixed';
-    indicator.style.top = '10px';
-    indicator.style.right = '10px';
-    indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    indicator.style.color = 'white';
-    indicator.style.padding = '5px 10px';
-    indicator.style.borderRadius = '5px';
-    indicator.style.font = '14px Arial, sans-serif';
-    indicator.textContent = 'Audio loading...';
-    document.body.appendChild(indicator);
-}
-
-function hideAudioLoadingIndicator() {
-    const indicator = document.getElementById('audioLoadingIndicator');
-    if (indicator) {
-        indicator.remove();
-    }
 }
 
 function onMouseMove(event) {
