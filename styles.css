@@ -1,7 +1,9 @@
 body { 
     margin: 0; 
     overflow: hidden; 
-    background-color: #000; 
+    background-color: #000;
+    font-family: 'Space Mono', monospace;
+    color: #fff;
 }
 .controls {
     position: absolute;
@@ -10,7 +12,6 @@ body {
     padding: 10px;
     border-radius: 5px;
     color: white;
-    font-family: 'Space Mono', monospace;
     font-weight: 300;
 }
 .controls.open {
@@ -66,9 +67,8 @@ body {
     bottom: 10px;
     right: 10px;
     color: rgba(255, 255, 255, 0.5);
-    font-family: 'Space Mono', monospace;
-    font-weight: 300;
-    font-size: 12px;
+    font-weight: 200;
+    font-size: 11px;
 }
 .button {
     background: transparent;
@@ -77,7 +77,13 @@ body {
     padding: 5px 10px;
     cursor: pointer;
     font-family: 'Space Mono', monospace;
-    font-size: 0.8em;
+    font-size: 0.7em;
     margin-right: 5px;
     text-decoration: none;
+}
+#percentageCounter {
+    font-weight: 200;
+}
+#startButton {
+    font-weight: 200;
 }
