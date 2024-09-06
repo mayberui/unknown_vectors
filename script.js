@@ -65,6 +65,9 @@ function init() {
     const fullScreenButton = document.getElementById('fullScreenButton');
     fullScreenButton.addEventListener('click', toggleFullScreen);
 
+    const startButton = document.getElementById('startButton');
+    startButton.addEventListener('click', startAudio);
+
     setupAudioContext();
     startPercentageCounter();
     animate();
@@ -114,11 +117,12 @@ function setupAudioContext() {
 
 function startPercentageCounter() {
     let counter = 0;
-    const maxPercentage = 187;
-    const duration = 3000; // 3 seconds
+    const maxPercentage = 777;
+    const duration = 5000; // 5 seconds
     const interval = duration / maxPercentage;
 
     const counterElement = document.getElementById('percentageCounter');
+    const startButton = document.getElementById('startButton');
     
     const updateCounter = () => {
         counter++;
@@ -126,12 +130,21 @@ function startPercentageCounter() {
         
         if (counter >= maxPercentage) {
             clearInterval(counterInterval);
-            counterElement.style.display = 'none';
-            loadAudio();
+            startButton.style.display = 'inline-block';
         }
     };
 
     const counterInterval = setInterval(updateCounter, interval);
+}
+
+function startAudio() {
+    const counterElement = document.getElementById('percentageCounter');
+    const startButton = document.getElementById('startButton');
+
+    counterElement.style.display = 'none';
+    startButton.style.display = 'none';
+
+    loadAudio();
 }
 
 function loadAudio() {
