@@ -8,6 +8,7 @@ let cameraAngle = 0;
 let raycaster, mouse;
 let particleWidth = 80;
 let isAudioLoaded = false;
+let isAudioStarted = false;
 
 function init() {
     scene = new THREE.Scene();
@@ -64,8 +65,10 @@ function init() {
     const fullScreenButton = document.getElementById('fullScreenButton');
     fullScreenButton.addEventListener('click', toggleFullScreen);
 
-    initAudio();
+    setupAudioContext();
+    addAudioStartListener();
     animate();
+    showAudioLoadingIndicator();
 }
 
 function createParticles() {
@@ -103,16 +106,29 @@ function resetParticle(positions, colors, index) {
     colors[index + 2] = Math.random();
 }
 
-function initAudio() {
+function setupAudioContext() {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
 
-    loadAudio().catch(error => {
-        console.error('Autoplay failed:', error);
-        showStartOverlay();
+function addAudioStartListener() {
+    const startAudio = () => {
+        if (!isAudioStarted) {
+            isAudioStarted = true;
+            loadAudio().then(() => {
+                hideAudioLoadingIndicator();
+            }).catch(error => {
+                console.error('Failed to load audio:', error);
+                alert('Failed to load audio. The animation will continue without audio reactivity.');
+                hideAudioLoadingIndicator();
+            });
+        }
+    };
+
+    ['click', 'touchstart', 'keydown'].forEach(eventType => {
+        document.addEventListener(eventType, startAudio, { once: true });
     });
 }
 
@@ -139,38 +155,26 @@ function loadAudio() {
         });
 }
 
-function showStartOverlay() {
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '1000';
-    overlay.style.cursor = 'pointer';
+function showAudioLoadingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'audioLoadingIndicator';
+    indicator.style.position = 'fixed';
+    indicator.style.top = '10px';
+    indicator.style.right = '10px';
+    indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    indicator.style.color = 'white';
+    indicator.style.padding = '5px 10px';
+    indicator.style.borderRadius = '5px';
+    indicator.style.font = '14px Arial, sans-serif';
+    indicator.textContent = 'Audio loading...';
+    document.body.appendChild(indicator);
+}
 
-    const text = document.createElement('div');
-    text.textContent = 'Click to Start';
-    text.style.color = 'white';
-    text.style.fontSize = '24px';
-    text.style.fontFamily = 'Arial, sans-serif';
-
-    overlay.appendChild(text);
-    document.body.appendChild(overlay);
-
-    overlay.addEventListener('click', () => {
-        loadAudio().then(() => {
-            document.body.removeChild(overlay);
-        }).catch(error => {
-            console.error('Failed to load audio:', error);
-            alert('Failed to load audio. The animation will continue without audio reactivity.');
-            document.body.removeChild(overlay);
-        });
-    });
+function hideAudioLoadingIndicator() {
+    const indicator = document.getElementById('audioLoadingIndicator');
+    if (indicator) {
+        indicator.remove();
+    }
 }
 
 function onMouseMove(event) {
