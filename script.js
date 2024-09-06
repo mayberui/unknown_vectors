@@ -7,6 +7,7 @@ let audioSource;
 let cameraAngle = 0;
 let raycaster, mouse;
 let particleWidth = 80;
+let isAudioLoaded = false;
 
 function init() {
     scene = new THREE.Scene();
@@ -45,12 +46,6 @@ function init() {
         createParticles();
     });
 
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
-
     document.addEventListener('mousemove', onMouseMove, false);
 
     const toggleSlidersButton = document.getElementById('toggleSliders');
@@ -69,7 +64,7 @@ function init() {
     const fullScreenButton = document.getElementById('fullScreenButton');
     fullScreenButton.addEventListener('click', toggleFullScreen);
 
-    loadAudio();
+    initAudio();
     animate();
 }
 
@@ -108,8 +103,21 @@ function resetParticle(positions, colors, index) {
     colors[index + 2] = Math.random();
 }
 
+function initAudio() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    loadAudio().catch(error => {
+        console.error('Autoplay failed:', error);
+        showStartOverlay();
+    });
+}
+
 function loadAudio() {
-    fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
+    return fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
         .then(audioBuffer => {
@@ -121,14 +129,48 @@ function loadAudio() {
             audioSource.connect(analyser);
             audioSource.connect(audioContext.destination);
             audioSource.start(0);
+            isAudioLoaded = true;
             
             // Add event listener for when the audio ends
             audioSource.onended = function() {
                 const nextButton = document.getElementById('nextButton');
                 window.location.href = nextButton.href;
             };
-        })
-        .catch(e => console.error('Error with decoding audio data' + e.err));
+        });
+}
+
+function showStartOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '1000';
+    overlay.style.cursor = 'pointer';
+
+    const text = document.createElement('div');
+    text.textContent = 'Click to Start';
+    text.style.color = 'white';
+    text.style.fontSize = '24px';
+    text.style.fontFamily = 'Arial, sans-serif';
+
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', () => {
+        loadAudio().then(() => {
+            document.body.removeChild(overlay);
+        }).catch(error => {
+            console.error('Failed to load audio:', error);
+            alert('Failed to load audio. The animation will continue without audio reactivity.');
+            document.body.removeChild(overlay);
+        });
+    });
 }
 
 function onMouseMove(event) {
@@ -139,7 +181,9 @@ function onMouseMove(event) {
 function animate() {
     requestAnimationFrame(animate);
 
-    analyser.getByteFrequencyData(dataArray);
+    if (isAudioLoaded) {
+        analyser.getByteFrequencyData(dataArray);
+    }
 
     const positions = particles.geometry.attributes.position.array;
     const colors = particles.geometry.attributes.color.array;
@@ -154,9 +198,15 @@ function animate() {
         const y = positions[i3 + 1];
         const z = positions[i3 + 2];
 
-        const distance = Math.sqrt(x * x + y * y + z * z);
-        const index = Math.floor((distance / particleWidth) * dataArray.length);
-        const audioData = dataArray[index] / 255.0;
+        let audioData = 0;
+        if (isAudioLoaded) {
+            const distance = Math.sqrt(x * x + y * y + z * z);
+            const index = Math.floor((distance / particleWidth) * dataArray.length);
+            audioData = dataArray[index] / 255.0;
+        } else {
+            // Fallback animation when audio is not loaded
+            audioData = (Math.sin(Date.now() * 0.001 + i * 0.1) + 1) * 0.5;
+        }
 
         positions[i3 + 2] = z + (audioData - 0.5) * sensitivity;
 
