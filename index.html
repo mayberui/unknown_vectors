@@ -11,27 +11,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="controls">
-        <div class="buttons-container">
-            <button id="toggleSliders" class="button">***</button>
-            <button id="fullScreenButton" class="button">*</button>
-            <a href="https://linkedin.com/in/mayberui" id="nextButton" class="button" target="_blank">&gt;</a>
-            <span id="percentageCounter" class="button"></span>
-            <button id="startButton" class="button" style="display: none;">start</button>
+    <div class="container">
+        <div class="controls">
+            <div class="buttons-container">
+                <button id="toggleSliders" class="button">***</button>
+                <button id="fullScreenButton" class="button">*</button>
+                <a href="https://linkedin.com/in/mayberui" id="nextButton" class="button" target="_blank">&gt;</a>
+                <span id="percentageCounter" class="button"></span>
+                <button id="startButton" class="button" style="display: none;">strt</button>
+            </div>
+            <div id="slidersContent" style="display: none; padding-top: 10px;">
+                <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">chaos</div>
+                <input type="range" id="particleCountSlider" class="slider" min="1000" max="20000" step="100" value="5000" style="width: 80%; height: 3px;">
+                <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">noise</div>
+                <input type="range" id="sizeSlider" class="slider" min="0.01" max="0.1" step="0.01" value="0.05" style="width: 80%; height: 3px;">
+                <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">warp</div>
+                <input type="range" id="sensitivitySlider" class="slider" min="0.1" max="5" step="0.1" value="1" style="width: 80%; height: 3px;">
+                <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">perception</div>
+                <input type="range" id="widthSlider" class="slider" min="40" max="120" step="1" value="80" style="width: 80%; height: 3px;">
+            </div>
         </div>
-        <div id="slidersContent" style="display: none; padding-top: 10px;">
-            <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">chaos</div>
-            <input type="range" id="particleCountSlider" class="slider" min="1000" max="20000" step="100" value="5000" style="width: 80%; height: 3px;">
-            <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">noise</div>
-            <input type="range" id="sizeSlider" class="slider" min="0.01" max="0.1" step="0.01" value="0.05" style="width: 80%; height: 3px;">
-            <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">warp</div>
-            <input type="range" id="sensitivitySlider" class="slider" min="0.1" max="5" step="0.1" value="1" style="width: 80%; height: 3px;">
-            <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">perception</div>
-            <input type="range" id="widthSlider" class="slider" min="40" max="120" step="1" value="80" style="width: 80%; height: 3px;">
+        <div class="watermark">
+            <a href="https://linkedin.com/in/mayberui" target="_blank" style="color: inherit; text-decoration: none;">mayberui.key</a>
         </div>
-    </div>
-    <div class="watermark">
-        <a href="https://linkedin.com/in/mayberui" target="_blank" style="color: inherit; text-decoration: none;">mayberui.key</a>
     </div>
     <script src="script.js"></script>
 </body>

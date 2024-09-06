@@ -69,7 +69,7 @@ function init() {
     startButton.addEventListener('click', startAudio);
 
     setupAudioContext();
-    startPercentageCounter();
+    startGlyphCounter();
     animate();
 }
 
@@ -115,33 +115,46 @@ function setupAudioContext() {
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-function startPercentageCounter() {
+function generateRandomGlyph() {
+    const glyphs = '[÷≠≈∞±∑∫∂√∆Ω∏πφ⊗⊕⊙⌐¬×°′″℮]';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+        result += glyphs[Math.floor(Math.random() * glyphs.length)];
+    }
+    return result;
+}
+
+function startGlyphCounter() {
     let counter = 0;
-    const maxPercentage = 777;
-    const duration = 5000; // 5 seconds
-    const interval = duration / maxPercentage;
+    const maxCounter = 777;
+    const duration = 4000; // 4 seconds
+    const interval = duration / maxCounter;
+    const glyphChangeInterval = 50; // Change glyph every 50ms for a more dynamic effect
 
     const counterElement = document.getElementById('percentageCounter');
     const startButton = document.getElementById('startButton');
     
+    const updateGlyph = () => {
+        counterElement.textContent = generateRandomGlyph();
+    };
+
     const updateCounter = () => {
         counter++;
-        counterElement.textContent = `${counter}%`;
         
-        if (counter >= maxPercentage) {
+        if (counter >= maxCounter) {
             clearInterval(counterInterval);
+            clearInterval(glyphInterval);
+            counterElement.style.display = 'none';
             startButton.style.display = 'inline-block';
         }
     };
 
     const counterInterval = setInterval(updateCounter, interval);
+    const glyphInterval = setInterval(updateGlyph, glyphChangeInterval);
 }
 
 function startAudio() {
-    const counterElement = document.getElementById('percentageCounter');
     const startButton = document.getElementById('startButton');
-
-    counterElement.style.display = 'none';
     startButton.style.display = 'none';
 
     loadAudio();
