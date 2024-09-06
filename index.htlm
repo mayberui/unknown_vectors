@@ -1,0 +1,314 @@
+<html><head><base href="https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/"><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+    body { margin: 0; overflow: hidden; background-color: #000; }
+    .controls {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        color: white;
+        font-family: 'Space Mono', monospace;
+        font-weight: 300;
+    }
+    .controls.open {
+        background: rgba(0,0,0,0.7);
+    }
+    .buttons-container {
+        margin-bottom: 15px;
+    }
+    .slider-container {
+        margin-top: 10px;
+    }
+    .slider {
+        width: 100%;
+        margin: 15px 0;
+        -webkit-appearance: none;
+        background: transparent;
+        outline: none;
+    }
+    .slider::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 1px;
+        background: #aaa;
+        border: none;
+        border-radius: 3px;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: 1px solid #aaa;
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        background: #aaa;
+        cursor: pointer;
+        margin-top: -4px;
+    }
+    .slider::-moz-range-track {
+        width: 100%;
+        height: 1px;
+        background: #aaa;
+        border: none;
+        border-radius: 3px;
+    }
+    .slider::-moz-range-thumb {
+        border: 1px solid #aaa;
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        background: #aaa;
+        cursor: pointer;
+    }
+    .watermark {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        color: rgba(255, 255, 255, 0.5);
+        font-family: 'Space Mono', monospace;
+        font-weight: 300;
+        font-size: 12px;
+    }
+    .button {
+        background: transparent;
+        color: #aaa;
+        border: 1px solid #aaa;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.8em;
+        margin-right: 5px;
+        text-decoration: none;
+    }
+</style>
+</head><body>
+<div class="controls">
+    <div class="buttons-container">
+        <button id="toggleSliders" class="button">***</button>
+        <button id="fullScreenButton" class="button">*</button>
+        <a href=https://linkedin.com/in/meyberui" id="nextButton" class="button" target="_blank">&gt;</a>
+    </div>
+    <div id="slidersContent" style="display: none; padding-top: 10px;">
+        <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">chaos</div>
+        <input type="range" id="particleCountSlider" class="slider" min="1000" max="20000" step="100" value="5000" style="width: 80%; height: 3px;">
+        <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">noise</div>
+        <input type="range" id="sizeSlider" class="slider" min="0.01" max="0.1" step="0.01" value="0.05" style="width: 80%; height: 3px;">
+        <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">warp</div>
+        <input type="range" id="sensitivitySlider" class="slider" min="0.1" max="5" step="0.1" value="1" style="width: 80%; height: 3px;">
+        <div style="margin-bottom: 5px; font-size: 0.8em; color: #aaa;">perception</div>
+        <input type="range" id="widthSlider" class="slider" min="40" max="120" step="1" value="80" style="width: 80%; height: 3px;">
+    </div>
+</div>
+<div class="watermark">
+    <a href="https://linkedin.com/in/meyberui" target="_blank" style="color: inherit; text-decoration: none;">mayberui.key</a>
+</div>
+<script>
+// The JavaScript code remains unchanged
+let scene, camera, renderer, particles;
+let particleCount = 5000;
+let particleSize = 0.05;
+let sensitivity = 1.0;
+let audioContext, analyser, dataArray;
+let audioSource;
+let cameraAngle = 0;
+let raycaster, mouse;
+let particleWidth = 80;
+
+function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    createParticles();
+
+    camera.position.z = 40;
+
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
+    const particleCountSlider = document.getElementById('particleCountSlider');
+    particleCountSlider.addEventListener('input', function() {
+        particleCount = parseInt(this.value);
+        createParticles();
+    });
+
+    const sizeSlider = document.getElementById('sizeSlider');
+    sizeSlider.addEventListener('input', function() {
+        particleSize = parseFloat(this.value);
+        createParticles();
+    });
+
+    const sensitivitySlider = document.getElementById('sensitivitySlider');
+    sensitivitySlider.addEventListener('input', function() {
+        sensitivity = parseFloat(this.value);
+    });
+
+    const widthSlider = document.getElementById('widthSlider');
+    widthSlider.addEventListener('input', function() {
+        particleWidth = parseInt(this.value);
+        createParticles();
+    });
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    document.addEventListener('mousemove', onMouseMove, false);
+
+    const toggleSlidersButton = document.getElementById('toggleSliders');
+    const slidersContent = document.getElementById('slidersContent');
+    const controls = document.querySelector('.controls');
+    toggleSlidersButton.addEventListener('click', function() {
+        if (slidersContent.style.display === 'none') {
+            slidersContent.style.display = 'block';
+            controls.classList.add('open');
+        } else {
+            slidersContent.style.display = 'none';
+            controls.classList.remove('open');
+        }
+    });
+
+    const fullScreenButton = document.getElementById('fullScreenButton');
+    fullScreenButton.addEventListener('click', toggleFullScreen);
+
+    loadAudio();
+    animate();
+}
+
+function createParticles() {
+    if (particles) scene.remove(particles);
+
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+        resetParticle(positions, colors, i);
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: particleSize,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+    });
+
+    particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+}
+
+function resetParticle(positions, colors, index) {
+    positions[index] = (Math.random() - 0.5) * particleWidth;
+    positions[index + 1] = (Math.random() - 0.5) * (particleWidth / 2);
+    positions[index + 2] = (Math.random() - 0.5) * (particleWidth / 2);
+
+    colors[index] = Math.random();
+    colors[index + 1] = Math.random();
+    colors[index + 2] = Math.random();
+}
+
+function loadAudio() {
+    fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+            if (audioSource) {
+                audioSource.disconnect();
+            }
+            audioSource = audioContext.createBufferSource();
+            audioSource.buffer = audioBuffer;
+            audioSource.connect(analyser);
+            audioSource.connect(audioContext.destination);
+            audioSource.start(0);
+            
+            // Add event listener for when the audio ends
+            audioSource.onended = function() {
+                const nextButton = document.getElementById('nextButton');
+                window.location.href = nextButton.href;
+            };
+        })
+        .catch(e => console.error('Error with decoding audio data' + e.err));
+}
+
+function onMouseMove(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    const positions = particles.geometry.attributes.position.array;
+    const colors = particles.geometry.attributes.color.array;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObject(particles);
+
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const x = positions[i3];
+        const y = positions[i3 + 1];
+        const z = positions[i3 + 2];
+
+        const distance = Math.sqrt(x * x + y * y + z * z);
+        const index = Math.floor((distance / particleWidth) * dataArray.length);
+        const audioData = dataArray[index] / 255.0;
+
+        positions[i3 + 2] = z + (audioData - 0.5) * sensitivity;
+
+        // Check if particle is off the scene and reset it
+        if (Math.abs(x) > particleWidth / 2 || Math.abs(y) > particleWidth / 4 || Math.abs(z) > particleWidth / 4) {
+            resetParticle(positions, colors, i3);
+        }
+
+        if (intersects.length > 0 && intersects[0].index === i) {
+            colors[i3] = 1;
+            colors[i3 + 1] = 1;
+            colors[i3 + 2] = 1;
+        } else {
+            colors[i3] = audioData;
+            colors[i3 + 1] = 1 - audioData;
+            colors[i3 + 2] = 0.5;
+        }
+    }
+
+    particles.geometry.attributes.position.needsUpdate = true;
+    particles.geometry.attributes.color.needsUpdate = true;
+
+    cameraAngle += 0.005;
+    camera.position.x = Math.sin(cameraAngle) * (particleWidth / 2);
+    camera.position.z = Math.cos(cameraAngle) * (particleWidth / 2);
+    camera.lookAt(scene.position);
+
+    renderer.render(scene, camera);
+}
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+init();
+</script></body></html>
