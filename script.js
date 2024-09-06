@@ -127,9 +127,9 @@ function generateRandomGlyph() {
 function startGlyphCounter() {
     let counter = 0;
     const maxCounter = 777;
-    const duration = 4000; // 4 seconds
+    const duration = 3000; // 3 seconds
     const interval = duration / maxCounter;
-    const glyphChangeInterval = 50; // Change glyph every 50ms for a more dynamic effect
+    const glyphChangeInterval = 30; // Change glyph every 50ms for a more dynamic effect
 
     const counterElement = document.getElementById('percentageCounter');
     const startButton = document.getElementById('startButton');
