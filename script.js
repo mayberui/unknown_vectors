@@ -11,7 +11,9 @@ let isAudioLoaded = false;
 let isAudioStarted = false;
 let isControlsActive = false;
 let redirectTimer;
-let isAudioEnded = false;
+let audioTimer;
+const AUDIO_DURATION = 196; // 3:16 in seconds
+const MODAL_SHOW_TIME = 30; // Show modal 30 seconds before the end
 
 function init() {
     scene = new THREE.Scene();
@@ -223,10 +225,12 @@ function loadAudio() {
             // Activate controls after audio is loaded
             activateControls();
 
-            // Add event listener for when the audio ends
+            // Start the audio timer
+            startAudioTimer();
+
+            // Set up redirection after audio ends
             audioSource.onended = function() {
-                isAudioEnded = true;
-                handleModalOpen();
+                setTimeout(redirectToLinkedIn, 500); // Redirect 0.5 seconds after audio ends
             };
         })
         .catch(error => {
@@ -235,6 +239,19 @@ function loadAudio() {
             // Activate controls even if audio fails to load
             activateControls();
         });
+}
+
+function startAudioTimer() {
+    let timeElapsed = 0;
+    audioTimer = setInterval(() => {
+        timeElapsed++;
+        if (timeElapsed === AUDIO_DURATION - MODAL_SHOW_TIME) {
+            handleModalOpen();
+        }
+        if (timeElapsed >= AUDIO_DURATION) {
+            clearInterval(audioTimer);
+        }
+    }, 1000);
 }
 
 function onMouseMove(event) {
@@ -335,21 +352,9 @@ function typeText(text) {
             terminalText.innerHTML += text.charAt(i);
             i++;
             setTimeout(type, 15);
-        } else {
-            // Start the 15-second timer after typing is complete, only if audio has ended
-            if (isAudioEnded) {
-                startRedirectTimer();
-            }
         }
     }
     type();
-}
-
-function startRedirectTimer() {
-    if (redirectTimer) {
-        clearTimeout(redirectTimer);
-    }
-    redirectTimer = setTimeout(redirectToLinkedIn, 15000);
 }
 
 function redirectToLinkedIn() {
@@ -359,10 +364,6 @@ function redirectToLinkedIn() {
 function closeModal() {
     const modal = document.getElementById('aboutModal');
     modal.style.display = 'none';
-    // Clear the redirect timer when the modal is closed
-    if (redirectTimer) {
-        clearTimeout(redirectTimer);
-    }
 }
 
 window.addEventListener('resize', () => {
