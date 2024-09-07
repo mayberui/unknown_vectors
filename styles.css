@@ -90,18 +90,20 @@ body {
 .button {
     background: transparent;
     color: #aaa;
-    border: 1px solid #aaa;
+    border: .5px solid #aaa;
     padding: 5px 10px;
     cursor: pointer;
     font-family: 'Space Mono', monospace;
-    font-size: 10px;
+    font-size: 12px;
     margin-right: 5px;
     text-decoration: none;
     transition: opacity 0.3s ease;
+    box-shadow: 0 0 2px #4BA481;
 }
 
 .button.inactive {
     opacity: 0.3;
+    box-shadow: 0 0 0px #000000;
     cursor: default;
     pointer-events: none;
 }
@@ -135,13 +137,13 @@ body {
 
 .modal-content {
     background-color: rgba(0, 0, 0, 0.9);
-    border: 1px solid #4BA481;
+    border: 1px solid #aaa;
     padding: 20px;
     width: 80%;
-    max-width: 600px;
+    max-width: 500px;
     color: #4BA481;
     font-family: 'Space Mono', monospace;
-    box-shadow: 0 0 10px #4BA481;
+    box-shadow: 0 0 3px #4BA481;
 }
 
 .close-button {
