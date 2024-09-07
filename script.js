@@ -341,15 +341,30 @@ function handleModalOpen() {
     modal.style.display = 'flex';
     const terminalText = document.querySelector('.terminal-text');
     terminalText.innerHTML = '';
-    typeText("Welcome to Unknown Vectors\n\nThis project is an interactive audio-visual experience that combines particle systems with audio reactivity.\n\nControls:\n- '✶✶✶': Toggle sliders\n- '⛶': Toggle fullscreen\n- '>': Show this about section\n\nCreated by: mayberui.key\nGitHub: https://github.com/mayberui\nLinkedIn: https://linkedin.com/in/mayberui\n\nEnjoy the experience!");
+    typeText("This is the first of a series of experiments I've been doing with Claude and Cursor.\n\nMore are on the way, so if you're interested, watch this space.\n\nIn the meantime let's connect:\n\nGitHub: https://github.com/mayberui\nLinkedIn: https://linkedin.com/in/mayberui");
 }
 
 function typeText(text) {
     const terminalText = document.querySelector('.terminal-text');
+    terminalText.innerHTML = ''; // Clear existing content
     let i = 0;
+    let currentLine = '';
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'cursor';
+    cursorSpan.textContent = '';
+    terminalText.appendChild(cursorSpan);
+
     function type() {
         if (i < text.length) {
-            terminalText.innerHTML += text.charAt(i);
+            if (text.charAt(i) === '\n') {
+                currentLine += '<br>';
+                terminalText.innerHTML = currentLine;
+                terminalText.appendChild(cursorSpan);
+            } else {
+                currentLine += text.charAt(i);
+                terminalText.innerHTML = currentLine;
+                terminalText.appendChild(cursorSpan);
+            }
             i++;
             setTimeout(type, 15);
         }

@@ -29,11 +29,11 @@ body {
 }
 
 .buttons-container {
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 .slider-container {
-    margin-top: 8px;
+    margin-top: 5%;
 }
 
 .slider {
@@ -83,27 +83,31 @@ body {
 .watermark {
     color: rgba(255, 255, 255, 0.5);
     font-weight: 200;
-    font-size: 10px;
-    padding: px;
+    font-size: 12px;
+    padding: 0px;
+    margin-bottom: 6px;
+    margin-right: 5px;
 }
 
 .button {
     background: transparent;
-    color: #aaa;
+    color: #b7b6b6;
     border: .5px solid #aaa;
     padding: 5px 10px;
+    opacity: 0.8;
+    align-items: middle;
     cursor: pointer;
     font-family: 'Space Mono', monospace;
-    font-size: 12px;
+    font-size: 13px;
     margin-right: 5px;
     text-decoration: none;
     transition: opacity 0.3s ease;
-    box-shadow: 0 0 2px #4BA481;
+    box-shadow: 0 0 3px #4BA481;
 }
 
 .button.inactive {
-    opacity: 0.3;
-    box-shadow: 0 0 0px #000000;
+    opacity: 0.2;
+    box-shadow: 0 0 0px #00000000;
     cursor: default;
     pointer-events: none;
 }
@@ -130,27 +134,27 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.382);
     align-items: center;
     justify-content: center;
 }
 
 .modal-content {
     background-color: rgba(0, 0, 0, 0.9);
-    border: 1px solid #aaa;
+    border:.5px solid #aaa;
     padding: 20px;
     width: 80%;
     max-width: 500px;
     color: #4BA481;
     font-family: 'Space Mono', monospace;
-    box-shadow: 0 0 3px #4BA481;
+    box-shadow: 0 0 2px #4BA481;
 }
 
 .close-button {
     color: #4BA481;
     float: right;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 200;
     cursor: pointer;
 }
 
@@ -171,19 +175,19 @@ body {
 .cursor {
     display: inline-block;
     width: 10px;
-    height: 18px;
+    height: 10px;
+    border-radius: 50%;
     background-color: #4BA481;
     animation: blink 0.7s infinite;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 
 @keyframes blink {
-    0% {
-        opacity: 0;
-    }
-    50% {
+    0%, 100% {
         opacity: 1;
     }
-    100% {
-        opacity: 0;
+    50% {
+        opacity: .7;
     }
 }
