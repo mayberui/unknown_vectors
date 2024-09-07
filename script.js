@@ -116,7 +116,7 @@ function setupAudioContext() {
 }
 
 function generateRandomGlyph() {
-    const glyphs = '[÷≠≈∞±∑∫∂√∆Ω∏@€£¶÷±πφ⊗⊕⊙⌐¬×°″℮]';
+    const glyphs = '[÷≠≈∞±∑∫∂√∆Ω∏@€£¶÷±πφ⊗⊕⊙⌐¬×°″℮]';
     let result = '';
     for (let i = 0; i < 4; i++) {
         result += glyphs[Math.floor(Math.random() * glyphs.length)];
@@ -126,8 +126,8 @@ function generateRandomGlyph() {
 
 function startGlyphCounter() {
     let counter = 0;
-    const maxCounter = 777;
-    const duration = 3000; // 3 seconds
+    const maxCounter = 400;
+    const duration = 2000; // 3 seconds
     const interval = duration / maxCounter;
     const glyphChangeInterval = 30; // Change glyph every 50ms for a more dynamic effect
 
@@ -146,6 +146,7 @@ function startGlyphCounter() {
             clearInterval(glyphInterval);
             counterElement.style.display = 'none';
             startButton.style.display = 'inline-block';
+            startButton.style.color = '#4BA481'; // Set text color to green
         }
     };
 
