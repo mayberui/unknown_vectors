@@ -9,6 +9,7 @@ let raycaster, mouse;
 let particleWidth = 80;
 let isAudioLoaded = false;
 let isAudioStarted = false;
+let isControlsActive = false;
 
 function init() {
     scene = new THREE.Scene();
@@ -26,25 +27,33 @@ function init() {
 
     const particleCountSlider = document.getElementById('particleCountSlider');
     particleCountSlider.addEventListener('input', function() {
-        particleCount = parseInt(this.value);
-        createParticles();
+        if (isControlsActive) {
+            particleCount = parseInt(this.value);
+            createParticles();
+        }
     });
 
     const sizeSlider = document.getElementById('sizeSlider');
     sizeSlider.addEventListener('input', function() {
-        particleSize = parseFloat(this.value);
-        createParticles();
+        if (isControlsActive) {
+            particleSize = parseFloat(this.value);
+            createParticles();
+        }
     });
 
     const sensitivitySlider = document.getElementById('sensitivitySlider');
     sensitivitySlider.addEventListener('input', function() {
-        sensitivity = parseFloat(this.value);
+        if (isControlsActive) {
+            sensitivity = parseFloat(this.value);
+        }
     });
 
     const widthSlider = document.getElementById('widthSlider');
     widthSlider.addEventListener('input', function() {
-        particleWidth = parseInt(this.value);
-        createParticles();
+        if (isControlsActive) {
+            particleWidth = parseInt(this.value);
+            createParticles();
+        }
     });
 
     document.addEventListener('mousemove', onMouseMove, false);
@@ -53,17 +62,23 @@ function init() {
     const slidersContent = document.getElementById('slidersContent');
     const controls = document.querySelector('.controls');
     toggleSlidersButton.addEventListener('click', function() {
-        if (slidersContent.style.display === 'none') {
-            slidersContent.style.display = 'block';
-            controls.classList.add('open');
-        } else {
-            slidersContent.style.display = 'none';
-            controls.classList.remove('open');
+        if (isControlsActive) {
+            if (slidersContent.style.display === 'none') {
+                slidersContent.style.display = 'block';
+                controls.classList.add('open');
+            } else {
+                slidersContent.style.display = 'none';
+                controls.classList.remove('open');
+            }
         }
     });
 
     const fullScreenButton = document.getElementById('fullScreenButton');
-    fullScreenButton.addEventListener('click', toggleFullScreen);
+    fullScreenButton.addEventListener('click', function() {
+        if (isControlsActive) {
+            toggleFullScreen();
+        }
+    });
 
     const startButton = document.getElementById('startButton');
     startButton.addEventListener('click', startAudio);
@@ -155,13 +170,26 @@ function startGlyphCounter() {
 }
 
 function startAudio() {
+    console.log('Start button clicked');
     const startButton = document.getElementById('startButton');
     startButton.style.display = 'none';
 
     loadAudio();
 }
 
+function activateControls() {
+    console.log('Activating controls');
+    isControlsActive = true;
+    const inactiveElements = document.querySelectorAll('.inactive');
+    inactiveElements.forEach(element => {
+        element.classList.remove('inactive');
+        console.log('Removed inactive class from:', element);
+    });
+    console.log('Controls activated');
+}
+
 function loadAudio() {
+    console.log('Loading audio');
     fetch('https://audio.jukehost.co.uk/zUB1SLo69unK7KIszyg0y1SoMAye8jQy')
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
@@ -175,6 +203,10 @@ function loadAudio() {
             audioSource.connect(audioContext.destination);
             audioSource.start(0);
             isAudioLoaded = true;
+            console.log('Audio loaded and started');
+            
+            // Activate controls after audio is loaded
+            activateControls();
             
             // Add event listener for when the audio ends
             audioSource.onended = function() {
@@ -185,6 +217,8 @@ function loadAudio() {
         .catch(error => {
             console.error('Failed to load audio:', error);
             alert('Failed to load audio. The animation will continue without audio reactivity.');
+            // Activate controls even if audio fails to load
+            activateControls();
         });
 }
 

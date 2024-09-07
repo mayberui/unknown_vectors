@@ -97,6 +97,18 @@ body {
     font-size: 10px;
     margin-right: 5px;
     text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.button.inactive {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+}
+
+#slidersContent.inactive .slider {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 #percentageCounter {
