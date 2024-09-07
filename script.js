@@ -10,6 +10,8 @@ let particleWidth = 80;
 let isAudioLoaded = false;
 let isAudioStarted = false;
 let isControlsActive = false;
+let redirectTimer;
+let isAudioEnded = false;
 
 function init() {
     scene = new THREE.Scene();
@@ -82,6 +84,19 @@ function init() {
 
     const startButton = document.getElementById('startButton');
     startButton.addEventListener('click', startAudio);
+
+    const aboutButton = document.getElementById('aboutButton');
+    aboutButton.addEventListener('click', openModal);
+
+    const closeButton = document.querySelector('.close-button');
+    closeButton.addEventListener('click', closeModal);
+
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('aboutModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
 
     setupAudioContext();
     startGlyphCounter();
@@ -207,11 +222,11 @@ function loadAudio() {
             
             // Activate controls after audio is loaded
             activateControls();
-            
+
             // Add event listener for when the audio ends
             audioSource.onended = function() {
-                const nextButton = document.getElementById('nextButton');
-                window.location.href = nextButton.href;
+                isAudioEnded = true;
+                handleModalOpen();
             };
         })
         .catch(error => {
@@ -295,6 +310,58 @@ function toggleFullScreen() {
         if (document.exitFullscreen) {
             document.exitFullscreen();
         }
+    }
+}
+
+function openModal() {
+    if (isControlsActive) {
+        handleModalOpen();
+    }
+}
+
+function handleModalOpen() {
+    const modal = document.getElementById('aboutModal');
+    modal.style.display = 'flex';
+    const terminalText = document.querySelector('.terminal-text');
+    terminalText.innerHTML = '';
+    typeText("Welcome to Unknown Vectors\n\nThis project is an interactive audio-visual experience that combines particle systems with audio reactivity.\n\nControls:\n- '✶✶✶': Toggle sliders\n- '⛶': Toggle fullscreen\n- '>': Show this about section\n\nCreated by: mayberui.key\nGitHub: https://github.com/mayberui\nLinkedIn: https://linkedin.com/in/mayberui\n\nEnjoy the experience!");
+}
+
+function typeText(text) {
+    const terminalText = document.querySelector('.terminal-text');
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            terminalText.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 15);
+        } else {
+            // Start the 15-second timer after typing is complete, only if audio has ended
+            if (isAudioEnded) {
+                startRedirectTimer();
+            }
+        }
+    }
+    type();
+}
+
+function startRedirectTimer() {
+    if (redirectTimer) {
+        clearTimeout(redirectTimer);
+    }
+    redirectTimer = setTimeout(redirectToLinkedIn, 15000);
+}
+
+function redirectToLinkedIn() {
+    window.location.href = 'https://linkedin.com/in/mayberui';
+}
+
+function closeModal() {
+    const modal = document.getElementById('aboutModal');
+    modal.style.display = 'none';
+    // Clear the redirect timer when the modal is closed
+    if (redirectTimer) {
+        clearTimeout(redirectTimer);
     }
 }
 

@@ -119,3 +119,69 @@ body {
     font-weight: 200;
     color: #00ff00; /* Green text color */
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid #4BA481;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    color: #4BA481;
+    font-family: 'Space Mono', monospace;
+    box-shadow: 0 0 10px #4BA481;
+}
+
+.close-button {
+    color: #4BA481;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.terminal-text {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 12px;
+    font-weight: 200;
+}
+
+.cursor {
+    display: inline-block;
+    width: 10px;
+    height: 18px;
+    background-color: #4BA481;
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
