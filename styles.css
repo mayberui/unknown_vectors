@@ -18,10 +18,10 @@ body {
 }
 
 .controls {
-    padding: 0px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 8px;
     color: white;
-    font-weight: 300;
+    font-weight: 200;
 }
 
 .controls.open {
@@ -29,11 +29,11 @@ body {
 }
 
 .buttons-container {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .slider-container {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .slider {
@@ -83,7 +83,8 @@ body {
 .watermark {
     color: rgba(255, 255, 255, 0.5);
     font-weight: 200;
-    font-size: 11px;
+    font-size: 10px;
+    padding: px;
 }
 
 .button {
@@ -93,7 +94,7 @@ body {
     padding: 5px 10px;
     cursor: pointer;
     font-family: 'Space Mono', monospace;
-    font-size: 0.7em;
+    font-size: 10px;
     margin-right: 5px;
     text-decoration: none;
 }
